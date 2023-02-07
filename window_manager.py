@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QApplication, QMainWindow,)
 
-from API_UI import Ui_MainWindow
+from api_ui import Ui_MainWindow
 
 
 class Window(QMainWindow, Ui_MainWindow):
