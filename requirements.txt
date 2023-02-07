@@ -1,0 +1,2 @@
+pyQT5
+requests
