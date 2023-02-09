@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(131, 131, 131);</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
@@ -106,7 +109,7 @@
         <item>
          <widget class="QCheckBox" name="is_postal_code">
           <property name="text">
-           <string>CheckBox</string>
+           <string>Do you want to get a postal code?</string>
           </property>
          </widget>
         </item>
