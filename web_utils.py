@@ -58,6 +58,20 @@ def geosearch_request(*, apikey, text, center,
     return json
 
 
+def generate_image(geosearch_json):
+    organization = geosearch_json["features"][0]
+    point = organization["geometry"]["coordinates"]
+    org_point = "{0},{1}".format(point[0], point[1])
+    span = '0.005,0.005'
+    img_content = static_maps_request(
+        address_ll=org_point,
+        span=span,
+        org_point=org_point,
+    )
+    with open('image.png', 'wb') as file:
+        file.write(img_content)
+
+
 def get_ll_by_address(key, address):
     coords = geocoder_request(key, address)['Point']['pos']
     return coords.replace(' ', ',')
