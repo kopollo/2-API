@@ -30,11 +30,11 @@ def geocoder_request(apikey: str, geocode: str, format: str = 'json'):
         "GeoObject"]
 
 
-def static_maps_request(address_ll, span, org_point, map_type: str = 'map'):
+def static_maps_request(address_ll, z, org_point, map_type: str = 'map'):
     API_SERVER = 'https://static-maps.yandex.ru/1.x/'
     params = {
         'll': address_ll,
-        'spn': ','.join(map(str, span)),
+        'z': z,
         'l': map_type,
         "pt": "{0},pm2dgl".format(org_point)
     }
@@ -43,14 +43,12 @@ def static_maps_request(address_ll, span, org_point, map_type: str = 'map'):
     return response.content
 
 
-def geosearch_request(*, apikey, text, center,
-                      lang: str = 'ru_RU', type_: str = 'biz'):
+def geosearch_request(*, apikey, text, lang: str = 'ru_RU', type_: str = 'biz'):
     API_SERVER = "https://search-maps.yandex.ru/v1/"
     map_params = {
         'apikey': apikey,
         'text': text,
         'lang': lang,
-        'll': center,
         'type': type_,
     }
     response = get_request(API_SERVER, params=map_params)
@@ -58,20 +56,16 @@ def geosearch_request(*, apikey, text, center,
     return json
 
 
-def generate_image(geosearch_json):
+def generate_image(geosearch_json, z: int = 8, map_type: str = 'map'):
     organization = geosearch_json["features"][0]
     point = organization["geometry"]["coordinates"]
     org_point = "{0},{1}".format(point[0], point[1])
-    span = '0.005,0.005'
     img_content = static_maps_request(
         address_ll=org_point,
-        span=span,
         org_point=org_point,
+        map_type=map_type,
+        z=z
     )
-    with open('image.png', 'wb') as file:
+    with open('map.png', 'wb') as file:
         file.write(img_content)
 
-
-def get_ll_by_address(key, address):
-    coords = geocoder_request(key, address)['Point']['pos']
-    return coords.replace(' ', ',')
