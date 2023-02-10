@@ -27,26 +27,51 @@ class Window(QMainWindow, Ui_MainWindow):
         generate_image(json, z=self.z)
         self.pixmap = QPixmap('map.png')
         self.show_image()
-
+        
+    def eventFilter(self, obj, e):
+        if obj == self.image and e.type() == 2:
+            temp = list(map(int, str(e.pos()).split('(')[1][:-1].split(',')))
+            print(temp)
+            self.searchByOrganization(temp)
+        return super(QMainWindow, self).eventFilter(obj, e)
+    
     def keyPressEvent(self, event):
-        # use english layout
-        # need to do it by value
-        if event.key() == Qt.Key_W:
-            if self.z < 17:
-                self.z += 1
-                self.take_picture()
-        if event.key() == Qt.Key_S:
-            if self.z > 0:
-                self.z -= 1
-                self.take_picture()
-        if event.key() == Qt.Key_Left:
-            pass
+        if event.key() == Qt.Key_PageUp:
+            try:
+                self.mashtab.setPlainText(str(float(self.mashtab.toPlainText()) + 0.01))
+                self.setImageToPixmap()
+            except FloatingPointError as e:
+                print(e)
+        if event.key() == Qt.Key_PageDown:
+            try:
+                self.mashtab.setPlainText(str(float(self.mashtab.toPlainText()) - 0.01))
+                self.setImageToPixmap()
+            except FloatingPointError as e:
+                print(e)
         if event.key() == Qt.Key_Up:
-            pass
-        if event.key() == Qt.Key_Right:
-            pass
+            try:
+                self.edit_y.setPlainText(str(float(self.edit_y.toPlainText()) + (1 / 2) * float(self.mashtab.toPlainText())))
+                self.setImageToPixmap()
+            except FloatingPointError as e:
+                print(e)
         if event.key() == Qt.Key_Down:
-            pass
+            try:
+                self.edit_y.setPlainText(str(float(self.edit_y.toPlainText()) - (1 / 2) * float(self.mashtab.toPlainText())))
+                self.setImageToPixmap()
+            except FloatingPointError as e:
+                print(e)
+        if event.key() == Qt.Key_Right:
+            try:
+                self.edit_x.setPlainText(str(float(self.edit_x.toPlainText()) + 1 * float(self.mashtab.toPlainText())))
+                self.setImageToPixmap()
+            except FloatingPointError as e:
+                print(e)
+        if event.key() == Qt.Key_Left:
+            try:
+                self.edit_x.setPlainText(str(float(self.edit_x.toPlainText()) - 1 * float(self.mashtab.toPlainText())))
+                self.setImageToPixmap()
+            except FloatingPointError as e:
+                print(e)
 
 
 if __name__ == '__main__':
