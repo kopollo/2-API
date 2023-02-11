@@ -14,7 +14,7 @@ class Window(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle('test')
-        self.pixmap = QPixmap('./pict/Yandex.jpg')
+        self.pixmap = QPixmap('./style/Yandex.jpg')
         self.show_image()
         self.search.clicked.connect(self.take_picture)
         self.z = 8
@@ -31,22 +31,20 @@ class Window(QMainWindow, Ui_MainWindow):
     def keyPressEvent(self, event):
         # use english layout
         # need to do it by value
-        if event.key() == Qt.Key_W:
-            if self.z < 17:
+        if event.key() in [Qt.Key_Left, Qt.Key_Right, Qt.Key_Down, Qt.Key_W, Qt.Key_S,  Qt.Key_Up]:
+            if event.key() == Qt.Key_W and self.z < 17:
                 self.z += 1
-                self.take_picture()
-        if event.key() == Qt.Key_S:
-            if self.z > 0:
+            if event.key() == Qt.Key_S and self.z > 0:
                 self.z -= 1
-                self.take_picture()
-        if event.key() == Qt.Key_Left:
-            pass
-        if event.key() == Qt.Key_Up:
-            pass
-        if event.key() == Qt.Key_Right:
-            pass
-        if event.key() == Qt.Key_Down:
-            pass
+            if event.key() == Qt.Key_Left:
+                pass
+            if event.key() == Qt.Key_Up:
+                pass
+            if event.key() == Qt.Key_Right:
+                pass
+            if event.key() == Qt.Key_Down:
+                pass
+            self.take_picture()
 
 
 if __name__ == '__main__':
