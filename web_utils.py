@@ -54,9 +54,6 @@ def geosearch_request(*, apikey, text, lang: str = 'ru_RU', type_: str = 'biz'):
 
 
 def generate_image(*, center_point, org_point, scale, map_type):
-    # organization = geosearch_json["features"][0]
-    # point = organization["geometry"]["coordinates"]
-    # org_point = "{0},{1}".format(point[0], point[1])
     img_content = static_maps_request(
         center_point=center_point,
         org_point=org_point,
