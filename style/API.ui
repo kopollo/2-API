@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(131, 131, 131);</string>
+   <string notr="true">background-color: rgb(182, 167, 158);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -28,7 +28,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="address"/>
+       <widget class="QLineEdit" name="address">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 255, 255);</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -80,10 +84,18 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLineEdit" name="search_bar"/>
+         <widget class="QLineEdit" name="search_bar">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(255, 255, 255);</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="search">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(120, 156, 255);
+</string>
+          </property>
           <property name="text">
            <string>Search</string>
           </property>
@@ -115,6 +127,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="clear_btn">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(120, 156, 255);</string>
+          </property>
           <property name="text">
            <string>Clear</string>
           </property>
