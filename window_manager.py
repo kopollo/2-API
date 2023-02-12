@@ -87,6 +87,15 @@ class Geofinder(QMainWindow, Ui_MainWindow):
         self.map_type = Geofinder.MAP_TYPE[
             self.buttonGroup.checkedButton().text()]
         self.take_picture()
+        
+    def add_reverse_toponym_search(self, pos):
+        point = self.screen_to_geo(pos)
+        toponym = reverse_geocode(ll(point[0], point[1]))
+        self.search_result = SearchResult(
+            point,
+            toponym["metaDataProperty"]["GeocoderMetaData"]["text"] if toponym else None,
+            toponym["metaDataProperty"]["GeocoderMetaData"]["Address"].get(
+                "postal_code") if toponym else None)
 
 
 if __name__ == '__main__':
