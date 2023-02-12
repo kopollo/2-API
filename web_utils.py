@@ -28,7 +28,7 @@ def geocoder_request(apikey: str, geocode: str, format: str = 'json'):
         "GeoObject"]
 
 
-def static_maps_request(address_ll, scale, map_type):
+def static_maps_request(*, address_ll, scale, map_type):
     API_SERVER = 'https://static-maps.yandex.ru/1.x/'
     params = {
         'll': address_ll,
@@ -37,7 +37,6 @@ def static_maps_request(address_ll, scale, map_type):
         "pt": "{0},pm2dgl".format(address_ll)
     }
     response = get_request(API_SERVER, params)
-    # print(response.url)
     return response.content
 
 
@@ -54,12 +53,12 @@ def geosearch_request(*, apikey, text, lang: str = 'ru_RU', type_: str = 'biz'):
     return json
 
 
-def generate_image(*, address_ll, scale, map_type):
-    # organization = geosearch_json["features"][0]
-    # point = organization["geometry"]["coordinates"]
-    # org_point = "{0},{1}".format(point[0], point[1])
+def generate_image(*, geosearch_json, scale, map_type):
+    organization = geosearch_json["features"][0]
+    point = organization["geometry"]["coordinates"]
+    org_point = "{0},{1}".format(point[0], point[1])
     img_content = static_maps_request(
-        address_ll=address_ll,
+        address_ll=org_point,
         map_type=map_type,
         scale=scale
     )
