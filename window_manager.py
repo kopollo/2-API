@@ -47,7 +47,15 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def take_picture(self):
         # json = geosearch_request(apikey=GEOSEARCH_API_KEY, text=self.take_parameters())
-        generate_image(pt=self.pt, z=self.z, map_type=self.map_type, ll=self.ll)
+        # generate_image(
+        #     pt=self.pt, z=self.z, map_type=self.map_type, ll=self.ll
+        # )
+        generate_image(
+            address_ll=self.ll,
+            scale=self.z,
+            map_type=self.map_type,
+        )
+
         self.pixmap = QPixmap('map.png')
         self.show_image()
 
