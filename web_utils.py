@@ -28,13 +28,13 @@ def geocoder_request(apikey: str, geocode: str, format: str = 'json'):
         "GeoObject"]
 
 
-def static_maps_request(*, address_ll, scale, map_type):
+def static_maps_request(*, center_point, org_point, scale, map_type):
     API_SERVER = 'https://static-maps.yandex.ru/1.x/'
     params = {
-        'll': address_ll,
+        'll': center_point,
         'z': scale,
         'l': map_type,
-        "pt": "{0},pm2dgl".format(address_ll)
+        "pt": "{0},pm2dgl".format(org_point)
     }
     response = get_request(API_SERVER, params)
     return response.content
@@ -53,12 +53,13 @@ def geosearch_request(*, apikey, text, lang: str = 'ru_RU', type_: str = 'biz'):
     return json
 
 
-def generate_image(*, geosearch_json, scale, map_type):
-    organization = geosearch_json["features"][0]
-    point = organization["geometry"]["coordinates"]
-    org_point = "{0},{1}".format(point[0], point[1])
+def generate_image(*, center_point, org_point, scale, map_type):
+    # organization = geosearch_json["features"][0]
+    # point = organization["geometry"]["coordinates"]
+    # org_point = "{0},{1}".format(point[0], point[1])
     img_content = static_maps_request(
-        address_ll=org_point,
+        center_point=center_point,
+        org_point=org_point,
         map_type=map_type,
         scale=scale
     )
@@ -66,7 +67,12 @@ def generate_image(*, geosearch_json, scale, map_type):
         file.write(img_content)
 
 
-def get_ll_by_address(key, address):
-    coords = geocoder_request(key, address)['Point']['pos']
-    return coords.replace(' ', ',')
-
+def get_ll_by_address(*, key, address):
+    geosearch_json = geosearch_request(
+        apikey=key,
+        text=address,
+    )
+    organization = geosearch_json["features"][0]
+    point = organization["geometry"]["coordinates"]
+    point = "{0},{1}".format(point[0], point[1])
+    return point.replace(' ', ',')
