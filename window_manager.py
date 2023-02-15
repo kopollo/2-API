@@ -12,6 +12,7 @@ from web_utils import generate_image, geosearch_controller
 
 class Geofinder(QMainWindow, Ui_MainWindow):
     BASE_SCALE = 17
+    START_IMAGE_PATH = './style/Yandex.jpg'
     MAP_TYPE = {
         'Scheme': 'map',
         'Sputnik': 'sat',
@@ -31,13 +32,13 @@ class Geofinder(QMainWindow, Ui_MainWindow):
         self.map_type = Geofinder.MAP_TYPE['Scheme']
         self.org_name = None
         self.center_point = None
-        self.pixmap = QPixmap('./style/Yandex.jpg')
+        self.pixmap = QPixmap(self.START_IMAGE_PATH)
         self.scale = Geofinder.BASE_SCALE
 
         self.buttonGroup.buttonClicked.connect(self.change_type_map)
         self.search.clicked.connect(self._search_btn_clicked)
+        self.clear_btn.clicked.connect(self._clean_btn_clicked)
         self.show_image()
-
         self.search_bar.setText('гум')
 
     def show_image(self):
@@ -51,6 +52,14 @@ class Geofinder(QMainWindow, Ui_MainWindow):
         )
         self.center_point = self.org_point
         self.take_picture()
+
+    def _clean_btn_clicked(self):
+        self.scale = Geofinder.BASE_SCALE
+        self.org_name = None
+        self.search_bar.setText('')
+        self.address.setText('')
+        self.pixmap = QPixmap(self.START_IMAGE_PATH)
+        self.show_image()
 
     def take_picture(self):
         generate_image(
@@ -99,7 +108,7 @@ class Geofinder(QMainWindow, Ui_MainWindow):
 
     def scale_checker(self):
         self.scale = min(self.scale, 17)
-        self.scale = max(self.scale, 0)
+        self.scale = max(self.scale, 1)
 
     def count_latitude(self):
         H = 450
