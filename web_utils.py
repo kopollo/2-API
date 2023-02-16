@@ -1,4 +1,5 @@
 import requests
+from config import GEOSEARCH_API_KEY
 
 
 def get_request(server: str, params: dict[str, str] = None):
@@ -40,19 +41,6 @@ def static_maps_request(*, center_point, org_point, scale, map_type):
     return response.content
 
 
-def geosearch_request(*, apikey, text, lang: str = 'ru_RU', type_: str = 'biz'):
-    API_SERVER = "https://search-maps.yandex.ru/v1/"
-    map_params = {
-        'apikey': apikey,
-        'text': text,
-        'lang': lang,
-        'type': type_,
-    }
-    response = get_request(API_SERVER, params=map_params)
-    json = response.json()
-    return json
-
-
 def generate_image(*, center_point, org_point, scale, map_type):
     img_content = static_maps_request(
         center_point=center_point,
@@ -64,12 +52,42 @@ def generate_image(*, center_point, org_point, scale, map_type):
         file.write(img_content)
 
 
-def get_ll_by_address(*, key, address):
-    geosearch_json = geosearch_request(
-        apikey=key,
-        text=address,
-    )
-    organization = geosearch_json["features"][0]
-    point = organization["geometry"]["coordinates"]
-    point = "{0},{1}".format(point[0], point[1])
-    return point.replace(' ', ',')
+class GeosearchController:
+    def __init__(self):
+        self.apikey = GEOSEARCH_API_KEY
+
+    def get_ll_by_address(self, *, address):
+        geosearch_json = self.geosearch_request(
+            apikey=self.apikey,
+            text=address,
+        )
+        organization = geosearch_json["features"][0]
+        point = organization["geometry"]["coordinates"]
+        point = "{0},{1}".format(point[0], point[1])
+        return point.replace(' ', ',')
+
+    def get_full_address(self, *, address):
+        geosearch_json = self.geosearch_request(
+            apikey=self.apikey,
+            text=address,
+        )
+        organization = geosearch_json["features"][0]
+        address = organization["properties"]['description']
+        return address
+
+    @staticmethod
+    def geosearch_request(*, apikey, text, lang: str = 'ru_RU',
+                          type_: str = 'biz'):
+        API_SERVER = "https://search-maps.yandex.ru/v1/"
+        map_params = {
+            'apikey': apikey,
+            'text': text,
+            'lang': lang,
+            'type': type_,
+        }
+        response = get_request(API_SERVER, params=map_params)
+        json = response.json()
+        return json
+
+
+geosearch_controller = GeosearchController()

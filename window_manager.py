@@ -4,13 +4,15 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QApplication, QMainWindow, )
 
+import web_utils
 from api_ui import Ui_MainWindow
 from config import GEOSEARCH_API_KEY, GEOCODER_API_KEY
-from web_utils import generate_image, get_ll_by_address
+from web_utils import generate_image, geosearch_controller
 
 
 class Geofinder(QMainWindow, Ui_MainWindow):
     BASE_SCALE = 17
+    START_IMAGE_PATH = './style/Yandex.jpg'
     MAP_TYPE = {
         'Scheme': 'map',
         'Sputnik': 'sat',
@@ -30,13 +32,13 @@ class Geofinder(QMainWindow, Ui_MainWindow):
         self.map_type = Geofinder.MAP_TYPE['Scheme']
         self.org_name = None
         self.center_point = None
-        self.pixmap = QPixmap('./style/Yandex.jpg')
+        self.pixmap = QPixmap(self.START_IMAGE_PATH)
         self.scale = Geofinder.BASE_SCALE
 
         self.buttonGroup.buttonClicked.connect(self.change_type_map)
         self.search.clicked.connect(self._search_btn_clicked)
+        self.clear_btn.clicked.connect(self._clean_btn_clicked)
         self.show_image()
-
         self.search_bar.setText('гум')
 
     def show_image(self):
@@ -45,12 +47,19 @@ class Geofinder(QMainWindow, Ui_MainWindow):
     def _search_btn_clicked(self):
         self.scale = Geofinder.BASE_SCALE
         self.org_name = self.search_bar.text()
-        self.org_point = get_ll_by_address(
-            key=GEOSEARCH_API_KEY,
+        self.org_point = geosearch_controller.get_ll_by_address(
             address=self.org_name
         )
         self.center_point = self.org_point
         self.take_picture()
+
+    def _clean_btn_clicked(self):
+        self.scale = Geofinder.BASE_SCALE
+        self.org_name = None
+        self.search_bar.setText('')
+        self.address.setText('')
+        self.pixmap = QPixmap(self.START_IMAGE_PATH)
+        self.show_image()
 
     def take_picture(self):
         generate_image(
@@ -61,32 +70,59 @@ class Geofinder(QMainWindow, Ui_MainWindow):
         )
         self.pixmap = QPixmap('map.png')
         self.show_image()
+        self.address.setText(self.get_full_address())
+
+    def get_full_address(self):
+        return web_utils.geosearch_controller.get_full_address(
+            address=self.org_name
+        )
 
     def keyPressEvent(self, event):
-        W, H = 600, 450
-        if event.key() == Qt.Key_W and self.scale < 17:
+        if event.key() == Qt.Key_W:
             self.scale += 1
-        elif event.key() == Qt.Key_S and self.scale > 0:
+        elif event.key() == Qt.Key_S:
             self.scale -= 1
         elif event.key() in [Qt.Key_J, Qt.Key_L, Qt.Key_K, Qt.Key_I]:
-            longitude, latitude = [float(cord) for cord in
-                                   self.center_point.split(',')]
-            if event.key() == Qt.Key_J:
-                longitude -= 360 / (2 ** (self.scale + 8)) * W
-            if event.key() == Qt.Key_L:
-                longitude += 360 / (2 ** (self.scale + 8)) * W
-            if event.key() == Qt.Key_K:
-                latitude -= 180 / (2 ** (self.scale + 8)) * H
-            if event.key() == Qt.Key_I:
-                latitude += 180 / (2 ** (self.scale + 8)) * H
-            self.center_point = f'{longitude},{latitude}'
+            self.update_center_point(event)
+
         if event.key() in Geofinder.KEYBOARD_KEYS:
+            self.scale_checker()
             self.take_picture()
+
+    def update_center_point(self, event):
+        longitude, latitude = [float(cord) for cord in
+                               self.center_point.split(',')]
+        if event.key() == Qt.Key_J:
+            if longitude - self.count_longitude() > -180:
+                longitude -= self.count_longitude()
+        if event.key() == Qt.Key_L:
+            if longitude + self.count_longitude() < 180:
+                longitude += self.count_longitude()
+        if event.key() == Qt.Key_K:
+            if latitude - self.count_latitude() > -90:
+                latitude -= self.count_latitude()
+        if event.key() == Qt.Key_I:
+            if latitude + self.count_latitude() < 90:
+                latitude += self.count_latitude()
+        self.center_point = f'{longitude},{latitude}'
+
+    def scale_checker(self):
+        self.scale = min(self.scale, 17)
+        self.scale = max(self.scale, 1)
+
+    def count_latitude(self):
+        H = 450
+        return 180 / (2 ** (self.scale + 8)) * H
+
+    def count_longitude(self):
+        W = 600
+        return 360 / (2 ** (self.scale + 8)) * W
 
     def change_type_map(self):
         self.map_type = Geofinder.MAP_TYPE[
             self.buttonGroup.checkedButton().text()]
-        self.take_picture()
+        if self.org_name:
+            self.take_picture()
 
 
 if __name__ == '__main__':
